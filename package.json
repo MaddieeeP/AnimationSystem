@@ -1,0 +1,7 @@
+{
+  "name": "com.daydream.animationsystem",
+  "version": "0.0.0",
+  "displayName": "Animation System",
+  "description": "Custom animation system which allows for additional functionality over the standard Unity system.",
+  "rootnamespace": "daydream"
+}
