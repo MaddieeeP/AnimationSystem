@@ -11,7 +11,7 @@ public class SpriteCalculator : MonoBehaviour
 
     public Transform cameraTransform;
     public List<Sprite> spriteList;
-    public List<Vector3> spriteRotations;
+    public List<Quaternion> spriteRotations;
     public GameObject spriteObj;
 
     public Quaternion relativeRotation
@@ -24,7 +24,7 @@ public class SpriteCalculator : MonoBehaviour
         foreach (Sprite sprite in spriteList)
         {
             string[] rots = Regex.Split(sprite.name, ",");
-            Vector3 rotation = new Vector3(int.Parse(rots[0]), int.Parse(rots[1]), int.Parse(rots[2]));
+            Quaternion rotation = Quaternion.Euler(new Vector3(int.Parse(rots[0]), int.Parse(rots[1]), int.Parse(rots[2])));
             spriteRotations.Add(rotation);
         }
     }
@@ -38,12 +38,12 @@ public class SpriteCalculator : MonoBehaviour
 
     void SpriteUpdate()
     {
-        Vector3 closestRot = relativeRotation.FindClosest(spriteRotations);
+        int indexOfClosest = relativeRotation.FindClosest(spriteRotations);
+        Quaternion closestRot = spriteRotations[indexOfClosest]; 
 
-        spriteObj.GetComponent<SpriteRenderer>().sprite = spriteList[spriteRotations.IndexOf(closestRot)];
+        spriteObj.GetComponent<SpriteRenderer>().sprite = spriteList[indexOfClosest];
 
-        Quaternion spriteRotation = Quaternion.Euler(closestRot);
-        Debug.Log(relativeRotation.DivideBy(relativeRotation.DivideBy(spriteRotation) * spriteRotation));
+        Debug.Log(relativeRotation.DivideBy(relativeRotation.DivideBy(closestRot) * closestRot));
 
         if (billboard)
         {
