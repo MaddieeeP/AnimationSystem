@@ -2,7 +2,8 @@
     "name": "AnimationSystem",
     "rootNamespace": "",
     "references": [
-        "GUID:bf12cc0aae96ce648ab419c66c4cca20"
+        "GUID:bf12cc0aae96ce648ab419c66c4cca20",
+        "GUID:8b998754ea3b5a7479b3c31d37649543"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

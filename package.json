@@ -2,9 +2,11 @@
   "name": "com.daydream.animationsystem",
   "version": "0.0.0",
   "displayName": "Animation System",
-  "description": "Custom animation system which allows for additional functionality over the standard Unity system.",
+  "description": "Systems built to complement the standard Unity animation and rigging system.",
   "rootnamespace": "daydream",
   "dependencies": {
-    "com.daydream.extensionmethods": "0.0.0"
+    "com.daydream.extensionmethods": "0.0.0",
+    "com.daydream.fsm": "0.0.0",
+    "com.unity.animation.rigging": "1.2.1"
   }
 }
