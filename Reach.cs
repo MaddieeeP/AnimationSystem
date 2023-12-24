@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class Reach : ProceduralAnimator
 {
-    [SerializeField] private Transform boundingTransform;
     [SerializeField] private Vector3 reachFor;
     [SerializeField] private bool ignoreBounds = false;
     [SerializeField] private Bounds bounds;
@@ -33,12 +32,12 @@ public class Reach : ProceduralAnimator
         Vector3 position = reachFor; 
         if (bounds == null || ignoreBounds)
         {
-            position = dynamics.Next(reachFor);
+            position = DynamicsNext(reachFor);
         }
         else
         {
             position = position.Clamp(bounds.min, bounds.max);
-            position = dynamics.Next(position);
+            position = DynamicsNext(position);
             position = position.Clamp(bounds.min, bounds.max);
         }
         subject.position = position;

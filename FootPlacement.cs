@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,8 +8,10 @@ public class FootPlacement : ProceduralAnimator
     [SerializeField] private Transform hip;
     [SerializeField] private Vector3 gravityDirection = Vector3.down;
     [SerializeField] private List<Collider> ignoreColliders;
-    private float legLength = 0f;
+    private float _legLength = 0f;
+    public float legLength { get { return _legLength; } }
     private Vector3 position = Vector3.zero;
+    private Quaternion rotation = Quaternion.identity;
     private bool _grounded = false;
     public bool grounded { get { return _grounded; } }
 
@@ -23,19 +26,28 @@ public class FootPlacement : ProceduralAnimator
         Apply();
     }
 
-    void Initialize()
+    public void Initialize()
     {
-        legLength = GetLegLength(hip);
+        _legLength = GetLegLength(hip);
         position = subject.position;
+        rotation = subject.rotation;
     }
 
-    void Apply()
+    public void Apply()
     {
-        if (!_grounded | Vector3.Distance(hip.position, subject.position) > legLength)
-        {
-            position = GetFootPlacement(hip.position, legLength);
-        }
+        GetFootPlacement(hip.position, _legLength); //updates _grounded
+
         subject.position = position;
+        subject.rotation = rotation;
+    }
+
+    public bool GetNeedsMovement()
+    {
+        if (Vector3.Distance(hip.position, subject.position) > _legLength || !_grounded)
+        {
+            return true;
+        }
+        return false;
     }
 
     float GetLegLength(Transform parentBone)

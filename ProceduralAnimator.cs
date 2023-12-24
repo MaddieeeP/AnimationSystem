@@ -3,11 +3,13 @@ using UnityEngine;
 
 public class ProceduralAnimator : MonoBehaviour
 {
-    [SerializeField] protected Transform subject;
-    protected SecondOrderDynamics dynamics;
-    [SerializeField] protected float dynamicFrequency = 1f;
-    [SerializeField] protected float dynamicDamping = 0.5f;
-    [SerializeField] protected float dynamicResponse = 2f;
+    [SerializeField] protected Transform _subject;
+    [SerializeField] protected float _dynamicFrequency = 1f;
+    [SerializeField] protected float _dynamicDamp = 0.5f;
+    [SerializeField] protected float _dynamicResponse = 2f;
+    protected SecondOrderDynamics _dynamics;
+
+    public Transform subject { get { return _subject; } }
 
     void Start()
     {
@@ -22,20 +24,25 @@ public class ProceduralAnimator : MonoBehaviour
 
     public void InitializeDynamics()
     {
-        dynamics = new SecondOrderDynamics(dynamicFrequency, dynamicDamping, dynamicResponse, subject.position);
+        _dynamics = new SecondOrderDynamics(_dynamicFrequency, _dynamicDamp, _dynamicResponse, _subject.position);
     }
 
     public void ChangeDynamics(float frequency, float damping, float response)
     {
-        dynamicFrequency = frequency;
-        dynamicDamping = damping;
-        dynamicResponse = response;
+        _dynamicFrequency = frequency;
+        _dynamicDamp = damping;
+        _dynamicResponse = response;
         ChangeDynamics();
     }
 
     public void ChangeDynamics()
     {
-        dynamics.SetParameters(dynamicFrequency, dynamicDamping, dynamicResponse);
+        _dynamics.SetParameters(_dynamicFrequency, _dynamicDamp, _dynamicResponse);
+    }
+
+    public Vector3 DynamicsNext(Vector3 input)
+    {
+        return _dynamics.Next(input);
     }
 
     public void Initialize() { }
