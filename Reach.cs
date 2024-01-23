@@ -36,9 +36,9 @@ public class Reach : ProceduralAnimator
         }
         else
         {
-            position = position.Clamp(bounds.min, bounds.max);
+            position = position.ClampInBounds(bounds.min, bounds.max);
             position = DynamicsNext(position);
-            position = position.Clamp(bounds.min, bounds.max);
+            position = position.ClampInBounds(bounds.min, bounds.max);
         }
         subject.position = position;
     }
