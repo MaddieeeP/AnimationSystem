@@ -1,45 +1,35 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Reach : ProceduralAnimator
+public class Reach : MonoBehaviour
 {
-    [SerializeField] private Vector3 reachFor;
+    [SerializeField] private Vector3 _targetPosition;
     [SerializeField] private bool ignoreBounds = false;
     [SerializeField] private Bounds bounds;
 
-    void Start()
-    {
-        InitializeDynamics();
-        Initialize();
-    }
-
-    void Update()
-    {
-        Apply();
-    }
-
     public void ReachFor(Vector3 position)
     {
-        reachFor = position;
+        _targetPosition = position;
     }
 
     public void ReachFor(Transform transform) => ReachFor(transform.position);
 
-    public void Apply()
+    public void Update()
     {
-        Vector3 position = reachFor; 
+        if (_targetPosition == null)
+        {
+            return;
+        }
+
         if (bounds == null || ignoreBounds)
         {
-            position = DynamicsNext(reachFor);
+            //Next(_targetPosition);
         }
         else
         {
-            position = position.ClampInBounds(bounds.min, bounds.max);
-            position = DynamicsNext(position);
-            position = position.ClampInBounds(bounds.min, bounds.max);
+            //position = position.ClampInBounds(bounds.min, bounds.max);
+            //position = DynamicsNext(position);
+            //position = position.ClampInBounds(bounds.min, bounds.max);
         }
-        subject.position = position;
+        //transform.position = position;
     }
 }

@@ -1,12 +1,12 @@
 {
-    "name": "Daydream.AnimationSystem",
+    "name": "Daydream.AnimationSystem.Editor",
     "rootNamespace": "",
     "references": [
-        "GUID:bf12cc0aae96ce648ab419c66c4cca20",
-        "GUID:8b998754ea3b5a7479b3c31d37649543",
-        "GUID:4743074aa762f1344a87a37b7fdfac16"
+        "GUID:dbd5f0fae291bc042aec12c249178a66"
     ],
-    "includePlatforms": [],
+    "includePlatforms": [
+        "Editor"
+    ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

@@ -1,32 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class LookAtTarget : ProceduralAnimator
+public class LookAtTarget : MonoBehaviour
 {
-    private bool _auto = false;
-    public bool auto { get { return _auto; } set { _auto = value; } }
-    private float _maxDist = 10f;
-    public float maxDist { get { return _maxDist; } set { _maxDist = value; } }
-    [SerializeField] private Transform origin;
 
-    void Start()
-    {
-        InitializeDynamics();
-        Initialize();
-    }
-
-    void Update()
-    {
-        Apply();
-    }
-
-    void Apply()
-    {
-        if (auto)
-        {
-            //Physics.Raycast();
-        }
-    }
 }
+//intended behaviour decouple rotation from parent, restrict viewing x and y frustum relative to specified transform
+//when target moves, movement should be procedural, when parent moves, tracking should not be disturbed
+//virtual vector3 field to get look at target in world space
+//calculate local space coordinates
+//use producural animation result as local target
+//set rotation to lookrotation local target with virtual up field clamped within frustum
