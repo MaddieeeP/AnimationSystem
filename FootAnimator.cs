@@ -6,13 +6,13 @@ public class FootAnimator : MonoBehaviour
     [SerializeField] private PhysicActor _actor;
     [SerializeField] private Transform _hip;
     [SerializeField] private List<Collider> _ignoreColliders;
-    [SerializeField] private SecondOrderAnimator _secondOrderAnimator = new SecondOrderAnimator();
     [SerializeField] private AnimationCurve _footArc;
     [SerializeField] private float _speedDistanceScale = 1f;
     [SerializeField] private float _speedHeightScale = 1f;
     [SerializeField] private float _minimumStepDistance = 0.1f;
-    [SerializeField] private float _stepTimeLength = 0.1f;
     [SerializeField] private float _maximumLegLength = 0f;
+    [SerializeField] private float _stepTimeLength = 0.1f;
+    [SerializeField] private float _oppositeStepStageOffset = 0.5f;
     [SerializeField] private FootAnimator _oppositeFoot;
 
     private float _currentTime = 0f;
@@ -34,60 +34,51 @@ public class FootAnimator : MonoBehaviour
 
         _prevGroundedPosition = transform.position;
         _currentTime = _stepTimeLength;
-        
-        _secondOrderAnimator.SetPosition(_hip.position - up * _maximumLegLength); //FIX
     }
 
     public void Update()
     {
-        _secondOrderAnimator.Next(_hip.position - up * _maximumLegLength); //FIX - use Vector manipulation to transfer height of position?
-
         float speedProportion = _actor.subjectiveVelocity.magnitude / _actor.moveMaxSpeed;
 
-        if (Vector3.Distance(transform.position, _secondOrderAnimator.position) < _actor.subjectiveVelocity.magnitude * _speedDistanceScale / _actor.moveMaxSpeed + _minimumStepDistance && _grounded) //Maintain placement //FIX - rotation too, new parameter for resting leg length?
+        Vector3 nextGroundedPosition = (_hip.position - _maximumLegLength * up) + _actor.subjectiveVelocity * _stepTimeLength * 0.5f;
+
+        if (_grounded)
         {
-            transform.position = _position;
-            transform.rotation = _rotation;
-            return;
-        }
-
-        if (_grounded && _oppositeFoot.currentTime > _oppositeFoot.stepTimeLength * 0.5f) //Start step
-        {
-            _grounded = false;
-            _currentTime = 0f;
-
-            transform.position = _position;
-            transform.rotation = _rotation;
-            return;
-        }
-
-        _currentTime += Time.deltaTime;
-
-        if (_currentTime >= _stepTimeLength)
-        {
-            _currentTime = _stepTimeLength;
-            _grounded = true;
-            _prevGroundedPosition = _secondOrderAnimator.position;
-        }
-
-        float t = _currentTime / _stepTimeLength;
-        _position = (Vector3.Lerp(_prevGroundedPosition, _secondOrderAnimator.position, t)).RemoveComponentAlongAxis(up) + _hip.position.ComponentAlongAxis(up) + (_footArc.Evaluate(t) * speedProportion * _speedHeightScale - _maximumLegLength) * up;
-
-        transform.position = _position;
-        transform.rotation = _rotation;
-    }
-
-    float GetLegLength(Transform parentBone)
-    {
-        if (parentBone.childCount == 0)
-        {
-            return 0f;
+            if (Vector3.Distance(transform.position, nextGroundedPosition) > speedProportion * _speedDistanceScale + _minimumStepDistance && _oppositeFoot.currentTime > _oppositeFoot.stepTimeLength * _oppositeStepStageOffset) //Start step
+            {
+                _grounded = false;
+                _currentTime = 0f;
+            }
+            else
+            {
+                _position = _position * 1f; //FIX - slipping
+                _rotation = _rotation * Quaternion.identity;
+            }
+            
         }
         else
         {
-            Transform childBone = parentBone.GetChild(0);
-            return Vector3.Distance(parentBone.position, childBone.position) + GetLegLength(childBone);
+            _currentTime += Time.deltaTime;
+
+            if (_currentTime >= _stepTimeLength)
+            {
+                _currentTime = _stepTimeLength;
+                _grounded = true;
+                _prevGroundedPosition = nextGroundedPosition;
+
+                _position = nextGroundedPosition.RemoveComponentAlongAxis(up) + _hip.position.ComponentAlongAxis(up) - _maximumLegLength * up;
+                _rotation = _actor.transform.rotation;
+            }
+            else
+            {
+                float t = _currentTime / _stepTimeLength;
+                _position = (Vector3.Lerp(_prevGroundedPosition, nextGroundedPosition, t)).RemoveComponentAlongAxis(up) + _hip.position.ComponentAlongAxis(up) + (_footArc.Evaluate(t) * speedProportion * _speedHeightScale - _maximumLegLength) * up;
+                _rotation = Quaternion.Lerp(transform.rotation, _actor.transform.rotation, t);
+            }
         }
+
+        transform.position = _position;
+        transform.rotation = _rotation;
     }
 
     Vector3 GetFootPlacement(Vector3 origin, float maxDistance)
