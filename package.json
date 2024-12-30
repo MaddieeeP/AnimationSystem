@@ -7,6 +7,7 @@
   "dependencies": {
     "com.daydream.extensionmethods": "0.0.0",
     "com.daydream.fsm": "0.0.0",
+    "com.daydream.utilities": "0.0.0",
     "com.unity.animation.rigging": "1.2.1"
   }
 }
