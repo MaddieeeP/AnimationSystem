@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class WalkAnimatorHumanoid : WalkAnimator //Dictates when feet move in a walk animation
 {
-    [SerializeField] private PhysicActor _actor;
+    [SerializeField] private Actor _actor;
     [SerializeField] private WalkAnimatorFoot _dominantFoot;
     [SerializeField] private WalkAnimatorFoot _secondFoot;
 
@@ -31,45 +31,47 @@ public class WalkAnimatorHumanoid : WalkAnimator //Dictates when feet move in a 
 
     public override void LateUpdate()
     {
-        float deltaTime = PhysicObject.globalTime * _actor.relativeTime * Time.deltaTime;
+        float deltaTime = SimulationController.globalTimeScale * _actor.relativeTimeScale * Time.deltaTime;
+        Vector3 velocity = _actor.velocity;
+        Vector3 angularVelocity = _actor.angularVelocity;
 
         _dominantFoot.currentTime = Math.Clamp(_dominantFoot.currentTime, 0f, stepTimeLength);
         _secondFoot.currentTime = Math.Clamp(_secondFoot.currentTime, 0f, stepTimeLength);
 
-        TransformData restTransformDataDominant = _dominantFoot.GetRestTransformData(_actor.transform);
-        TransformData restTransformDataSecond = _secondFoot.GetRestTransformData(_actor.transform);
-        TransformData targetTransformDataDominant = GetTargetTransformData(restTransformDataDominant, _actor.compositeUp, _actor.subjectiveVelocity, stepTimeLength - _dominantFoot.currentTime, _maxStepHeight, _dominantFoot.ignoreColliders);
-        TransformData targetTransformDataSecond = GetTargetTransformData(restTransformDataSecond, _actor.compositeUp, _actor.subjectiveVelocity, stepTimeLength - _secondFoot.currentTime, _maxStepHeight, _secondFoot.ignoreColliders);
+        TransformInfo restTransformInfoDominant = _dominantFoot.GetRestTransformInfo(_actor.transform);
+        TransformInfo restTransformInfoSecond = _secondFoot.GetRestTransformInfo(_actor.transform);
+        TransformInfo targetTransformInfoDominant = GetTargetTransformInfo(restTransformInfoDominant, _actor.up, velocity, angularVelocity, stepTimeLength - _dominantFoot.currentTime, _maxStepHeight, _dominantFoot.ignoreColliders);
+        TransformInfo targetTransformInfoSecond = GetTargetTransformInfo(restTransformInfoSecond, _actor.up, velocity, angularVelocity, stepTimeLength - _secondFoot.currentTime, _maxStepHeight, _secondFoot.ignoreColliders);
         
         if (_dominantFoot.currentTime == stepTimeLength)
         {
-            if (MustMove(_dominantFoot, _actor.subjectiveVelocity, restTransformDataDominant, targetTransformDataDominant) || CanMove(_dominantFoot, _actor.subjectiveVelocity, restTransformDataDominant, targetTransformDataDominant) && _secondFoot.currentTime >= stepTimeLength * _oppositeStepStageOffset)
+            if (MustMove(_dominantFoot, velocity, angularVelocity, restTransformInfoDominant, targetTransformInfoDominant) || CanMove(_dominantFoot, velocity, angularVelocity, restTransformInfoDominant, targetTransformInfoDominant) && _secondFoot.currentTime >= stepTimeLength * _oppositeStepStageOffset)
             {
                 _dominantFoot.StartStep();
             }
         }
         if (_secondFoot.currentTime == stepTimeLength)
         {
-            if (MustMove(_secondFoot, _actor.subjectiveVelocity, restTransformDataSecond, targetTransformDataSecond) || CanMove(_secondFoot, _actor.subjectiveVelocity, restTransformDataSecond, targetTransformDataSecond) && _dominantFoot.currentTime >= stepTimeLength * _oppositeStepStageOffset)
+            if (MustMove(_secondFoot, velocity, angularVelocity, restTransformInfoSecond, targetTransformInfoSecond) || CanMove(_secondFoot, velocity, angularVelocity, restTransformInfoSecond, targetTransformInfoSecond) && _dominantFoot.currentTime >= stepTimeLength * _oppositeStepStageOffset)
             {
                 _secondFoot.StartStep();
             }
         }
 
-        Next(_dominantFoot, restTransformDataDominant, targetTransformDataDominant, deltaTime);
-        Next(_secondFoot, restTransformDataSecond, targetTransformDataSecond, deltaTime);
+        Next(_dominantFoot, restTransformInfoDominant, targetTransformInfoDominant, deltaTime);
+        Next(_secondFoot, restTransformInfoSecond, targetTransformInfoSecond, deltaTime);
     }
 
-    public override bool CanMove(WalkAnimatorFoot foot, Vector3 velocity, TransformData restTransformData, TransformData targetTransformData)
+    public override bool CanMove(WalkAnimatorFoot foot, Vector3 velocity, Vector3 angularVelocity, TransformInfo restTransformInfo, TransformInfo targetTransformInfo)
     {
-        foot.subject.rotation.ShortestRotation(targetTransformData.rotation).ToAngleAxis(out float angleDifference, out Vector3 _);
-        return Vector3.Distance(foot.subject.position, targetTransformData.position) > _minimumStepDistance || angleDifference > _minimumStepDegrees;
+        foot.subject.rotation.ShortestRotation(targetTransformInfo.rotation).ToAngleAxis(out float angleDifference, out Vector3 _);
+        return Vector3.Distance(foot.subject.position, targetTransformInfo.position) > _minimumStepDistance || angleDifference > _minimumStepDegrees;
     }
 
-    public override bool MustMove(WalkAnimatorFoot foot, Vector3 velocity, TransformData restTransformData, TransformData targetTransformData)
+    public override bool MustMove(WalkAnimatorFoot foot, Vector3 velocity, Vector3 angularVelocity, TransformInfo restTransformInfo, TransformInfo targetTransformInfo)
     {
-        foot.subject.rotation.ShortestRotation(targetTransformData.rotation).ToAngleAxis(out float angleDifference, out Vector3 _);
-        return Vector3.Distance(foot.subject.position, targetTransformData.position) > _maximumStepDistance || angleDifference > _maximumStepDegrees;
+        foot.subject.rotation.ShortestRotation(targetTransformInfo.rotation).ToAngleAxis(out float angleDifference, out Vector3 _);
+        return Vector3.Distance(foot.subject.position, targetTransformInfo.position) > _maximumStepDistance || angleDifference > _maximumStepDegrees;
     }
 
     public override void ApplyAnimation(WalkAnimatorFoot foot, float t)
