@@ -7,7 +7,7 @@ public class NeckAnimator : LookAtTargetFrustum
     [SerializeField] float _strength;
 
     protected override Vector3 forward { get { return _actor.transform.forward; } }
-    protected override Vector3 up { get { return _actor.up; } }
+    protected override Vector3 up { get { return -_actor.gravity; } }
     protected override Vector3 targetPosition { get { return _target.position; } }
 
     public override void Update()

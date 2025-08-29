@@ -31,8 +31,8 @@ public class WalkAnimatorHumanoid : WalkAnimator //Dictates when feet move in a 
 
     public override void LateUpdate()
     {
-        float deltaTime = SimulationController.globalTimeScale * _actor.relativeTimeScale * Time.deltaTime;
-        Vector3 velocity = _actor.velocity;
+        float deltaTime = Time.deltaTime; //FIX
+        Vector3 velocity = _actor.linearVelocity;
         Vector3 angularVelocity = _actor.angularVelocity;
 
         _dominantFoot.currentTime = Math.Clamp(_dominantFoot.currentTime, 0f, stepTimeLength);
@@ -40,8 +40,8 @@ public class WalkAnimatorHumanoid : WalkAnimator //Dictates when feet move in a 
 
         TransformInfo restTransformInfoDominant = _dominantFoot.GetRestTransformInfo(_actor.transform);
         TransformInfo restTransformInfoSecond = _secondFoot.GetRestTransformInfo(_actor.transform);
-        TransformInfo targetTransformInfoDominant = GetTargetTransformInfo(restTransformInfoDominant, _actor.up, velocity, angularVelocity, stepTimeLength - _dominantFoot.currentTime, _maxStepHeight, _dominantFoot.ignoreColliders);
-        TransformInfo targetTransformInfoSecond = GetTargetTransformInfo(restTransformInfoSecond, _actor.up, velocity, angularVelocity, stepTimeLength - _secondFoot.currentTime, _maxStepHeight, _secondFoot.ignoreColliders);
+        TransformInfo targetTransformInfoDominant = GetTargetTransformInfo(restTransformInfoDominant, -_actor.gravity, velocity, angularVelocity, stepTimeLength - _dominantFoot.currentTime, _maxStepHeight, _dominantFoot.ignoreColliders);
+        TransformInfo targetTransformInfoSecond = GetTargetTransformInfo(restTransformInfoSecond, -_actor.gravity, velocity, angularVelocity, stepTimeLength - _secondFoot.currentTime, _maxStepHeight, _secondFoot.ignoreColliders);
         
         if (_dominantFoot.currentTime == stepTimeLength)
         {
